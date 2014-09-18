@@ -2,10 +2,9 @@ import pyNN.spiNNaker as p
 import pylab
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 16 * 4 * 100
-nCores = 16 * 4
-p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / nCores)
-p.set_number_of_neurons_per_core("DelayExtension", nNeurons / nCores)
+nNeurons = 15 * 4 * 100
+p.set_number_of_neurons_per_core("IF_curr_exp", 100)
+p.set_number_of_neurons_per_core("DelayExtension", 100)
 
 cell_params_lif = {
     'cm': 0.25,
@@ -46,7 +45,7 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
-p.run(5000)
+p.run(30000)
 
 v = None
 gsyn = None

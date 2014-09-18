@@ -2,9 +2,10 @@ import pyNN.spiNNaker as p
 import pylab
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 15 * 4 * 100
-p.set_number_of_neurons_per_core("IF_curr_exp", 100)
-p.set_number_of_neurons_per_core("DelayExtension", 100)
+nNeuronsPerCore = 10
+nNeurons = 15 * 4 * nNeuronsPerCore
+p.set_number_of_neurons_per_core("IF_curr_exp", nNeuronsPerCore)
+p.set_number_of_neurons_per_core("DelayExtension", nNeuronsPerCore)
 
 cell_params_lif = {
     'cm': 0.25,
@@ -41,56 +42,17 @@ projections.append(p.Projection(populations[0], populations[0],
 projections.append(p.Projection(populations[1], populations[0],
         p.FromListConnector(injectionConnection)))
 
-populations[0].record_v()
-populations[0].record_gsyn()
 populations[0].record()
 
-p.run(30000)
+p.run(10000)
 
-v = None
-gsyn = None
-spikes = None
-
-v = populations[0].get_v(compatible_output=True)
-gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
 
-if spikes != None:
-    print spikes
-    pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('spikes')
-    pylab.title('spikes')
-    pylab.savefig("synfire_spikes.pdf", format="PDF")
-else:
-    print "No spikes received"
-
-# Make some graphs
-
-if v != None:
-    ticks = len(v) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('v')
-    pylab.title('v')
-    for pos in range(0, nNeurons, 20):
-        v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron],
-                [i[2] for i in v_for_neuron])
-    pylab.savefig("synfire_v.pdf", format="PDF")
-
-if gsyn != None:
-    ticks = len(gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron],
-                [i[2] for i in gsyn_for_neuron])
-    pylab.show()
-    pylab.savefig("synfire_gsyn.pdf", format="PDF")
+pylab.figure()
+pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
+pylab.xlabel('Time/ms')
+pylab.ylabel('spikes')
+pylab.title('spikes')
+pylab.savefig("synfire_spikes.pdf", format="PDF")
 
 p.end()
